@@ -1,15 +1,21 @@
-import os
 from pathlib import Path
-from django_environ import Env
+import os
+from dotenv import load_dotenv
 
+# Carrega variáveis do arquivo .env
+load_dotenv()
+
+# Corrige BASE_DIR para apontar para a raiz do projeto (3 níveis acima deste arquivo)
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
-env = Env()
-Env.read_env(os.path.join(BASE_DIR, '.env'))
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 
-SECRET_KEY = env('DJANGO_SECRET_KEY')
-DEBUG = env.bool('DJANGO_DEBUG', default=False)
-ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=['localhost'])
+if not SECRET_KEY:
+    raise ValueError("DJANGO_SECRET_KEY deve ser definida no arquivo .env")
+
+DEBUG = os.environ.get("DEBUG", "False").lower() in ("true", "1", "yes")
+
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -18,7 +24,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # apps de domínio serão adicionados aqui
 ]
 
 MIDDLEWARE = [
@@ -51,50 +56,47 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'igreja_dashboard.wsgi.application'
+ASGI_APPLICATION = 'igreja_dashboard.asgi.application'
 
+# Database (configure via env)
 DATABASES = {
-    'default': env.db('DATABASE_URL')
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
 }
 
+# Password validation
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.Argon2PasswordHasher',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
+# Email settings
+EMAIL_BACKEND = os.environ.get('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
+EMAIL_HOST = os.environ.get('EMAIL_HOST')
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT', '587'))
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True').lower() in ('true', '1', 'yes')
+EMAIL_USE_SSL = os.environ.get('EMAIL_USE_SSL', 'False').lower() in ('true', '1', 'yes')
+
+# Internationalization
 LANGUAGE_CODE = 'pt-br'
 TIME_ZONE = 'America/Sao_Paulo'
 USE_I18N = True
-USE_L10N = True
 USE_TZ = True
 
-STATIC_URL = '/static/'
+# Static files
+STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATICFILES_DIRS = [BASE_DIR / 'static']
 
+# Media files
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+# Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-EMAIL_HOST = env('EMAIL_HOST', default='smtp.example.com')
-EMAIL_PORT = env.int('EMAIL_PORT', default=587)
-EMAIL_HOST_USER = env('EMAIL_HOST_USER', default='')
-EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', default='')
-EMAIL_USE_TLS = env.bool('EMAIL_USE_TLS', default=True)
-EMAIL_USE_SSL = env.bool('EMAIL_USE_SSL', default=False)
-ENCRYPTION_KEY = env('ENCRYPTION_KEY', default='')
-PASSWORD_HASHERS = [
-    'django.contrib.auth.hashers.Argon2PasswordHasher',
-    'django.contrib.auth.hashers.PBKDF2PasswordHasher',
-    'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
-    'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
-]
