@@ -58,12 +58,12 @@
                                 <li><a class="dropdown-item" href="{% url 'users:profile' %}">Perfil</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="{% url 'admin:index' %}">Admin</a></li>
-                                <li><a class="dropdown-item" href="{% url 'users:logout' %}">Sair</a></li>
+                                <li><a class="dropdown-item" href="{% url 'users:profile' %}">Perfil</a></li>
                             </ul>
                         </li>
                     {% else %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'users:login' %}">Entrar</a>
+                            <a class="nav-link" href="{% url 'users:profile' %}">Perfil</a>
                         </li>
                     {% endif %}
                 </ul>
