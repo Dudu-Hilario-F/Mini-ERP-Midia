@@ -1,3 +1,5 @@
 from django.shortcuts import render
 
-# Create your views here.
+
+def list_midia(request):
+    return render(request, 'midia/list.html')

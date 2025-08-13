@@ -1,3 +1,5 @@
 from django.shortcuts import render
 
-# Create your views here.
+
+def list_escalas(request):
+    return render(request, 'escalas/list.html')

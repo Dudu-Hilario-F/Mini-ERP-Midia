@@ -1,0 +1,6 @@
+{% extends 'users/base_users.html' %}
+{% block users_title %}Perfil{% endblock %}
+{% block users_content %}
+<h1 class="h3">Meu Perfil</h1>
+<p>Bem-vindo, {{ user.get_full_name|default:user.username }}.</p>
+{% endblock %}

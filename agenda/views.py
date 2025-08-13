@@ -1,3 +1,5 @@
 from django.shortcuts import render
 
-# Create your views here.
+
+def list_agenda(request):
+    return render(request, 'agenda/list.html')
